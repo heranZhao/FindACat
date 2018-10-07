@@ -120,17 +120,13 @@ class ListActivity : AppCompatActivity(), ILoadMore {
                             adapter.notifyItemRemoved(petlist.size)
 
                             if(bingResponseBody != null) {
-                                var temp = bingResponseBody.petfinder?.pets?.pet
+                                var temp = bingResponseBody.petfinder?.pet
                                 if(temp != null)
                                 {
-                                    for(pet : Pet? in temp)
-                                    {
-                                        petlist.add(pet)
-                                    }
+                                    petlist.add(temp)
+                                    adapter.notifyItemInserted(petlist.size-1)
                                 }
-                                offset += returnSize
-                                adapter.notifyDataSetChanged()
-                                adapter.setLoaded()
+
 
                             }else{
                                 //TODO: handle response body null
