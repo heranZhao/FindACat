@@ -3,4 +3,7 @@
     <string name="cat_name">Name: </string>
     <string name="cat_sex">Gender:</string>
     <string name="cat_age">Age:</string>
+    <string name="btn_find">Find</string>
+    <string name="btn_like">LIKE</string>
+    <string name="cat_fact">CatFact:</string>
 </resources>

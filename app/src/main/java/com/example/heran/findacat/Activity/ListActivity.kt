@@ -111,7 +111,7 @@ class ListActivity : AppCompatActivity(), ILoadMore {
                     .enqueue(object: Callback<PetfinderPetRecord> {
 
                         override fun onFailure(call: Call<PetfinderPetRecord>, t: Throwable) {
-                            
+
                         }
 
                         override fun onResponse(call: Call<PetfinderPetRecord>, response: Response<PetfinderPetRecord>) {
