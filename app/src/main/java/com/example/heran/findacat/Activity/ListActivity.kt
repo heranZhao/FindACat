@@ -1,161 +1,102 @@
 package com.example.heran.findacat.Activity
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
-import com.example.heran.findacat.R
+import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.view.View
+import android.widget.LinearLayout
+import com.example.heran.findacat.Adapter.CatItemClickListener
 import com.example.heran.findacat.Adapter.CatsAdapter
 import com.example.heran.findacat.Adapter.ILoadMore
-import com.example.heran.findacat.Constants
+import com.example.heran.findacat.Manager.CatInfoManager
 import com.example.heran.findacat.Model.generated.Pet
-import com.example.heran.findacat.Model.generated.PetfinderPetRecord
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
-import retrofit2.http.GET
-import retrofit2.http.Query
+import com.example.heran.findacat.R
+import android.widget.Toast
+import org.jetbrains.anko.toast
 
 
-class ListActivity : AppCompatActivity(), ILoadMore {
+class ListActivity : AppCompatActivity(), ILoadMore, CatInfoManager.CatInfoFinishedListener, CatItemClickListener {
 
-    private lateinit var linearLayoutManager: LinearLayoutManager
+    private val KEY_PETIDX = "pet_idx"
+
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter : CatsAdapter
+    private lateinit var progressBarLayout : LinearLayout
+
 
     private var offset = 0
-    private val returnSize = 25
+    private val returnSize = 20
     private var zipCode : String = "22202"
     private var requestType : Int = 0
-
-    var petlist : MutableList<Pet?> = ArrayList()
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list)
 
-        linearLayoutManager = LinearLayoutManager(this)
         recyclerView = findViewById<RecyclerView>(R.id.rv_cat_list)
+        progressBarLayout = findViewById<LinearLayout>(R.id.ll_progress_bar)
 
-        recyclerView.layoutManager = linearLayoutManager
 
-        adapter = CatsAdapter(recyclerView, this, petlist)
+        recyclerView.layoutManager = GridLayoutManager(this, 2)
+        adapter = CatsAdapter(recyclerView, this, CatInfoManager.petlist)
         adapter.setLoadMore(this)
+
+
+        adapter.catclickListener = this
         recyclerView.adapter = adapter
+
+        progressBarLayout.visibility = View.GONE
+
+        CatInfoManager.catinfoListener = this
 
         getPetList()
 
     }
 
 
-
     fun getPetList()
     {
-        petlist.add(null)
-        adapter.notifyItemInserted(petlist.size-1)
-
-
-        val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
-        val retrofit = Retrofit.Builder()
-                .baseUrl(Constants.BING_SEARCH_URL)
-                .addConverterFactory(MoshiConverterFactory.create(moshi) )
-                .build()
-
-        if(requestType == 0)
-        {
-            val apiEndpoint = retrofit.create(ListActivity.petfinderPetRecordListInterface::class.java)
-            apiEndpoint.getBingResponse("${Constants.BING_API_KEY}", "cat",
-                    zipCode, "${returnSize}", "${offset}","json")
-                    .enqueue(object: Callback<PetfinderPetRecord> {
-
-                        override fun onFailure(call: Call<PetfinderPetRecord>, t: Throwable) {
-                            var a = 0
-                        }
-
-                        override fun onResponse(call: Call<PetfinderPetRecord>, response: Response<PetfinderPetRecord>) {
-                            val bingResponseBody = response.body()
-                            petlist.removeAt(petlist.size - 1)
-                            adapter.notifyItemRemoved(petlist.size)
-
-                            if(bingResponseBody != null) {
-                                var temp = bingResponseBody.petfinder?.pets?.pet
-                                if(temp != null)
-                                {
-                                    for(pet : Pet? in temp)
-                                    {
-                                        petlist.add(pet)
-                                    }
-                                }
-                                offset += returnSize
-                                adapter.notifyDataSetChanged()
-                                adapter.setLoaded()
-
-                            }else{
-                                //TODO: handle response body null
-
-                            }
-
-                        }
-
-                    })
-        }
-        else
-        {
-            val apiEndpoint = retrofit.create(ListActivity.petfinderPetRecordInterface::class.java)
-            apiEndpoint.getBingResponse("${Constants.BING_API_KEY}", "12333","json")
-                    .enqueue(object: Callback<PetfinderPetRecord> {
-
-                        override fun onFailure(call: Call<PetfinderPetRecord>, t: Throwable) {
-
-                        }
-
-                        override fun onResponse(call: Call<PetfinderPetRecord>, response: Response<PetfinderPetRecord>) {
-                            val bingResponseBody = response.body()
-                            petlist.removeAt(petlist.size - 1)
-                            adapter.notifyItemRemoved(petlist.size)
-
-                            if(bingResponseBody != null) {
-                                var temp = bingResponseBody.petfinder?.pet
-                                if(temp != null)
-                                {
-                                    petlist.add(temp)
-                                    adapter.notifyItemInserted(petlist.size-1)
-                                }
-
-
-                            }else{
-                                //TODO: handle response body null
-
-                            }
-
-                        }
-
-                    })
-        }
-
+        progressBarLayout.visibility = View.VISIBLE
+        CatInfoManager.getPetList(zipCode, "22202", "${offset}", "$returnSize")
     }
+
 
     override fun onLoadMore() {
 
-        if(petlist.size >=returnSize)
+        if(CatInfoManager.petlist.size >=returnSize)
             getPetList()
 
     }
 
-    interface petfinderPetRecordInterface{
-        @GET("pet.get")
-        fun getBingResponse(@Query("key") k:String, @Query("id") query: String, @Query("format") f : String): Call<PetfinderPetRecord>
+    override fun loadListSuccess() {
+
+        offset += returnSize
+        adapter.notifyDataSetChanged()
+        adapter.setLoaded()
+        progressBarLayout.visibility = View.GONE
+
     }
 
-    interface petfinderPetRecordListInterface{
-        @GET("pet.find")
-        fun getBingResponse(@Query("key") k:String, @Query("animal") animal : String, @Query("location") location: String, @Query("count") count : String, @Query("offset") offset : String, @Query("format") f : String): Call<PetfinderPetRecord>
+    override fun loadListFailure() {
     }
+
+    override fun loadSingleSuccess() {
+        adapter.notifyItemInserted(CatInfoManager.petlist.size-1)
+    }
+
+    override fun loadSingleFailure() {
+    }
+
+
+    override fun catClick(view : View, idx : Int)
+    {
+        val intent = Intent(this@ListActivity, CatDetailActivity::class.java)
+        intent.putExtra("PetIdx", idx)
+        startActivity(intent)
+    }
+
 
 }
 

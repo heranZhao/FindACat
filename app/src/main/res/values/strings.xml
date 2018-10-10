@@ -6,4 +6,6 @@
     <string name="btn_find">Find</string>
     <string name="btn_like">LIKE</string>
     <string name="cat_fact">CatFact:</string>
+    <string name="cat_zip">Zip:</string>
+    <string name="cat_breed">Breed:</string>
 </resources>
