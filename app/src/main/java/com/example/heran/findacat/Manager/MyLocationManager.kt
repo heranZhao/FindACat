@@ -49,7 +49,7 @@ class MyLocationManager
         hasGps = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
         hasNetWork = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
 
-        if(hasGps && hasNetWork)
+        if(hasGps || hasNetWork)
         {
             if(hasGps)
             {
@@ -78,6 +78,9 @@ class MyLocationManager
                 {
                     locationGps = localGpslocation
                 }
+
+                Longitude = locationGps!!.longitude
+                Latitude = locationGps!!.latitude
             }
             if(hasNetWork)
             {
@@ -106,25 +109,27 @@ class MyLocationManager
                 {
                     locationNetWork = localNetWorklocation
                 }
+                Longitude = locationNetWork!!.longitude
+                Latitude = locationNetWork!!.latitude
             }
 
-            Longitude = locationGps!!.longitude
-            Latitude = locationGps!!.latitude
+
+            if(locationGps != null && locationNetWork != null)
+            {
+                if(locationGps!!.accuracy > locationNetWork!!.accuracy)
+                {
+                    Longitude = locationGps!!.longitude
+                    Latitude = locationGps!!.latitude
+                }
+                else
+                {
+                    Longitude = locationNetWork!!.longitude
+                    Latitude = locationNetWork!!.latitude
+                }
+            }
 
             return getPostalCodeByCoordinates()
-//
-//            if(locationGps != null && locationNetWork != null)
-//            {
-//                if(locationGps!!.accuracy > locationNetWork!!.accuracy)
-//                {
-//
-//                }
-//                else
-//                {
-//                    Longitude = locationNetWork!!.longitude
-//                    Latitude = locationNetWork!!.latitude
-//                }
-//            }
+
         }
         else if(!hasGps)
         {

@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.LinearLayout
 import com.example.heran.findacat.Adapter.CatItemClickListener
@@ -14,6 +16,10 @@ import com.example.heran.findacat.Manager.CatInfoManager
 import com.example.heran.findacat.Model.generated.Pet
 import com.example.heran.findacat.R
 import android.widget.Toast
+import com.example.heran.findacat.Manager.CatInfoManager.getPetList
+import com.example.heran.findacat.Manager.PresistenceManager
+import kotlinx.android.synthetic.main.activity_catdetail.*
+import kotlinx.android.synthetic.main.activity_list.*
 import org.jetbrains.anko.toast
 
 
@@ -35,6 +41,13 @@ class ListActivity : AppCompatActivity(), ILoadMore, CatInfoManager.CatInfoFinis
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list)
 
+        setSupportActionBar(catlistToolbar)
+        val actionbar = supportActionBar
+        actionbar?.title = ""
+        actionbar?.setDisplayHomeAsUpEnabled(true)
+
+        PresistenceManager.setContext(this)
+
         recyclerView = findViewById<RecyclerView>(R.id.rv_cat_list)
         progressBarLayout = findViewById<LinearLayout>(R.id.ll_progress_bar)
 
@@ -42,23 +55,23 @@ class ListActivity : AppCompatActivity(), ILoadMore, CatInfoManager.CatInfoFinis
         recyclerView.layoutManager = GridLayoutManager(this, 2)
         adapter = CatsAdapter(recyclerView, this, CatInfoManager.petlist)
         adapter.setLoadMore(this)
-
-
         adapter.catclickListener = this
         recyclerView.adapter = adapter
 
-        progressBarLayout.visibility = View.GONE
 
+        progressBarLayout.visibility = View.GONE
         CatInfoManager.catinfoListener = this
 
-        getPetList()
+        if(CatInfoManager.petlist.size == 0) {
+            progressBarLayout.visibility = View.VISIBLE
+            getPetList()
+        }
 
     }
 
 
-    fun getPetList()
+    private fun getPetList()
     {
-        progressBarLayout.visibility = View.VISIBLE
         CatInfoManager.getPetList(zipCode, "22202", "${offset}", "$returnSize")
     }
 
@@ -66,8 +79,9 @@ class ListActivity : AppCompatActivity(), ILoadMore, CatInfoManager.CatInfoFinis
     override fun onLoadMore() {
 
         if(CatInfoManager.petlist.size >=returnSize)
+        {
             getPetList()
-
+        }
     }
 
     override fun loadListSuccess() {
@@ -97,6 +111,25 @@ class ListActivity : AppCompatActivity(), ILoadMore, CatInfoManager.CatInfoFinis
         startActivity(intent)
     }
 
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_catlist, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
+        R.id.btn_favorite -> {
+
+            true
+        }
+
+        else -> super.onOptionsItemSelected(item)
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
+    }
 
 }
 

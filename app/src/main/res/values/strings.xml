@@ -8,4 +8,9 @@
     <string name="cat_fact">CatFact:</string>
     <string name="cat_zip">Zip:</string>
     <string name="cat_breed">Breed:</string>
+    <string name="btn_menu_favorite">Favorite</string>
+    <string name="btn_menu_email">Email</string>
+    <string name="btn_menu_share">Share</string>
+    <string name="cat_des">Description</string>
+    <string name="btn_locationok">OK</string>
 </resources>

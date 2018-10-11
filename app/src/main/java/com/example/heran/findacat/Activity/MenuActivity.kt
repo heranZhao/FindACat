@@ -36,14 +36,9 @@ class MenuActivity : AppCompatActivity() {
 
 
         findBtn.setOnClickListener {
-            var intent = Intent( this, ListActivity::class.java)
+            val intent = Intent( this, ListActivity::class.java)
             startActivity(intent)
-
         }
-
-//        var zipcode = MyLocationManager().getLocation(this)
-//
-//        toast("$zipcode")
 
     }
 

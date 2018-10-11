@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.example.heran.findacat.Manager.CatInfoManager.petlist
 import com.example.heran.findacat.Model.generated.Pet
 import com.example.heran.findacat.R
 import com.squareup.picasso.Picasso
@@ -76,7 +77,7 @@ class CatsAdapter(recyclerView: RecyclerView,internal var activity: Activity, in
             val pet = petlist[p1]
             p0.catName?.text = pet?.name?.T.toString()
 
-            Picasso.get().load("${pet?.media?.photos?.photo?.get(0)?.T}").into(p0.catImg)
+            Picasso.get().load("${pet?.media?.photos?.photo?.get(2)?.T}").into(p0.catImg)
 
         }
     }

@@ -5,24 +5,32 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/catdetailToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:elevation="4dp"
+        android:outlineProvider="bounds"
+         />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
-        android:layout_weight="1">
+        android:layout_weight="3">
 
         <ImageView
             android:id="@+id/img_cat_detail"
             android:layout_width="180dp"
             android:layout_height="180dp"
+            android:layout_gravity="center_vertical"
             android:src="@drawable/ic_launcher_background"
             />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingLeft="10dp"
+            android:paddingStart="10dp"
             android:orientation="vertical">
 
             <LinearLayout
@@ -41,7 +49,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:maxLines="1"
-                    android:text = "asds"
                     android:textSize="@dimen/tv_catDetail"/>
 
             </LinearLayout>
@@ -61,7 +68,6 @@
                     android:id="@+id/tv_cat_gender_detail"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text = "M"
                     android:textSize="@dimen/tv_catDetail"/>
 
             </LinearLayout>
@@ -81,7 +87,6 @@
                     android:id="@+id/tv_cat_breed_detail"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text = "lll"
                     android:textSize="@dimen/tv_catDetail"/>
 
             </LinearLayout>
@@ -101,7 +106,6 @@
                     android:id="@+id/tv_cat_zip_detail"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text = "22202"
                     android:textSize="@dimen/tv_catDetail"/>
 
             </LinearLayout>
@@ -111,22 +115,33 @@
 
     </LinearLayout>
 
-    <android.support.v7.widget.CardView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:layout_weight="1"
-        app:cardElevation="8dp"
-        app:cardCornerRadius="2dp"
+        android:orientation="vertical"
+        android:layout_weight="2"
         android:layout_margin="8dp">
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text = "asdadasdasdadsasd"
+            android:text = "@string/cat_des"
             android:textSize="@dimen/tv_catDetail"/>
 
-    </android.support.v7.widget.CardView>
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/tv_cat_des_detail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/tv_catDetail"/>
+
+        </ScrollView>
+
+
+    </LinearLayout>
 
 
 </LinearLayout>
