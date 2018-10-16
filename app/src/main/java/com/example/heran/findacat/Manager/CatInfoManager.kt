@@ -27,7 +27,7 @@ object CatInfoManager
     }
 
 
-    fun getPetList(zipCode : String, location : String, offset : String, returnSize : String)
+    fun getPetList(zipCode : String, offset : String, returnSize : String)
     {
         val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
         val retrofit = Retrofit.Builder()
@@ -66,46 +66,6 @@ object CatInfoManager
                     }
 
                 })
-    }
-
-    fun getPetFavoriteList(zipCode : String, id : String)
-    {
-        val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
-        val retrofit = Retrofit.Builder()
-                .baseUrl(Constants.BING_SEARCH_URL)
-                .addConverterFactory(MoshiConverterFactory.create(moshi) )
-                .build()
-
-        val apiEndpoint = retrofit.create(PetfinderPetRecordInterface::class.java)
-        apiEndpoint.getBingResponse(Constants.BING_API_KEY,  id, "json")
-                .enqueue(object: Callback<PetfinderPetRecord> {
-
-                    override fun onFailure(call: Call<PetfinderPetRecord>, t: Throwable) {
-                        var a = 0
-                    }
-
-                    override fun onResponse(call: Call<PetfinderPetRecord>, response: Response<PetfinderPetRecord>) {
-                        val bingResponseBody = response.body()
-
-                        if(bingResponseBody != null) {
-                            val temp = bingResponseBody.petfinder?.pet
-                            if(temp != null)
-                            {
-                                catinfoListener?.loadSingleSuccess()
-                            }
-
-                        }else{
-                            catinfoListener?.loadSingleFailure()
-                        }
-
-                    }
-
-                })
-    }
-
-    interface PetfinderPetRecordInterface{
-        @GET("pet.get")
-        fun getBingResponse(@Query("key") k:String, @Query("id") id: String, @Query("format") f : String): Call<PetfinderPetRecord>
     }
 
     interface PetfinderPetRecordListInterface{

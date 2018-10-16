@@ -13,4 +13,5 @@
     <string name="btn_menu_share">Share</string>
     <string name="cat_des">Description</string>
     <string name="btn_locationok">OK</string>
+    <string name="btn_location_list">search</string>
 </resources>

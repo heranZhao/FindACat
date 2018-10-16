@@ -3,7 +3,6 @@ package com.example.heran.findacat.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.RecyclerView
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageView
@@ -14,6 +13,7 @@ import com.example.heran.findacat.Model.generated.Pet
 import com.example.heran.findacat.R
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_catdetail.*
+
 
 class CatDetailActivity: AppCompatActivity()
 {
@@ -83,15 +83,14 @@ class CatDetailActivity: AppCompatActivity()
     fun setFavorite(fav : Boolean)
     {
         isFavorite = fav
-        val id = pet?.id?.T
         if(isFavorite)
         {
-            PresistenceManager.addFavorite(id!!)
+            PresistenceManager.addFavorite(pet!!)
 
         }
         else
         {
-            PresistenceManager.rmvFavorite(id!!)
+            PresistenceManager.rmvFavorite(pet!!)
         }
     }
 
@@ -99,10 +98,7 @@ class CatDetailActivity: AppCompatActivity()
         menuInflater.inflate(R.menu.menu_catdetail, menu)
         actionBarMenu = menu
 
-        val id = pet?.id?.T
-
-        val list = PresistenceManager.getList()
-        if(list?.contains(id)!!)
+        if(PresistenceManager.isFavorite(pet!!))
         {
             setFavorite(true)
             (actionBarMenu.getItem(0) as MenuItem).setIcon(R.drawable.ic_action_favorite)

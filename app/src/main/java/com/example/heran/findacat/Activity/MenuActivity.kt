@@ -24,6 +24,7 @@ class MenuActivity : AppCompatActivity() {
     //private var mFusedLocationClient: FusedLocationProviderClient? = null
 
     private lateinit var findBtn : Button
+    private lateinit var favoriteBtn : Button
     private lateinit var tvcatFact : TextView
 
 
@@ -31,12 +32,19 @@ class MenuActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_menu)
 
-        findBtn = findViewById<Button>(R.id.menu_find_btn)
+        findBtn = findViewById(R.id.menu_find_btn)
+        favoriteBtn = findViewById(R.id.menu_favorite_btn)
         tvcatFact = findViewById<TextView>(R.id.tv_cat_fact)
 
 
         findBtn.setOnClickListener {
             val intent = Intent( this, ListActivity::class.java)
+            intent.putExtra("RequestType", 0)
+            startActivity(intent)
+        }
+        favoriteBtn.setOnClickListener {
+            val intent = Intent( this, ListActivity::class.java)
+            intent.putExtra("RequestType", 1)
             startActivity(intent)
         }
 
@@ -82,10 +90,10 @@ class MenuActivity : AppCompatActivity() {
 
                                     val fact: String = getString(R.string.cat_fact)
 
-                                    tvcatFact.text = "$fact ${bingResponseBody.fact}"
+                                    tvcatFact.text = bingResponseBody.fact
                                     Handler().postDelayed({
                                         keepgoing = true
-                                    },5000)
+                                    },10000)
 
                                 }else{
 

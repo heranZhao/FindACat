@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/listactivity"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
     <LinearLayout
         android:layout_width="match_parent"
@@ -10,7 +12,7 @@
         <android.support.v7.widget.Toolbar
             android:id="@+id/catlistToolbar"
             android:layout_width="match_parent"
-            android:layout_height="70dp"
+            android:layout_height="50dp"
             android:elevation="4dp"
             android:outlineProvider="bounds"
             />
@@ -28,9 +30,9 @@
         android:id="@+id/ll_progress_bar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center_vertical|center_horizontal"
-        android:background="@color/colorprogressBarBG"
-        android:alpha="0.7">
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center_vertical|center_horizontal">
 
         <ProgressBar
             android:layout_width="wrap_content"
@@ -38,5 +40,16 @@
 
     </LinearLayout>
 
+
+    <LinearLayout
+        android:id="@+id/ll_pop_window_bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center_vertical|center_horizontal"
+        android:orientation="vertical">
+
+    </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

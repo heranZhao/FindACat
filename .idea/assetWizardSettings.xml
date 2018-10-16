@@ -23,7 +23,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/Applications/Android%20Studio.app/Contents/plugins/android/lib/android.jar!/images/material_design_icons/social/ic_share_black_24dp.xml" />
+                                                <entry key="url" value="jar:file:/Applications/Android%20Studio.app/Contents/plugins/android/lib/android.jar!/images/material_design_icons/device/ic_location_searching_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -34,7 +34,7 @@
                                   <option name="values">
                                     <map>
                                       <entry key="imageAsset" value="$PROJECT_DIR$/../baseline-favorite_border-black-18/2x/baseline_favorite_border_black_18dp.png" />
-                                      <entry key="outputName" value="ic_action_share" />
+                                      <entry key="outputName" value="ic_action_location" />
                                       <entry key="theme" value="CUSTOM" />
                                       <entry key="themeColor" value="000000" />
                                     </map>

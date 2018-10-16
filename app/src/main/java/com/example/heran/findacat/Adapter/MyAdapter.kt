@@ -3,9 +3,11 @@ package com.example.heran.findacat.Adapter
 import android.app.Activity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import com.example.heran.findacat.Manager.CatInfoManager.petlist
 import com.example.heran.findacat.Model.generated.Pet
 import com.example.heran.findacat.R
@@ -61,6 +63,7 @@ class CatsAdapter(recyclerView: RecyclerView,internal var activity: Activity, in
         val view = LayoutInflater.from(activity).inflate(R.layout.cat_list_item, p0, false)
         val mViewHolder = ItemViewHolder(view)
         view.setOnClickListener { v -> catclickListener!!.catClick(v, mViewHolder.adapterPosition) }
+
         return mViewHolder
     }
 
