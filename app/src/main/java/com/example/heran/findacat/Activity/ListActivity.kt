@@ -1,53 +1,61 @@
 package com.example.heran.findacat.Activity
 
-import android.app.Activity
-import android.app.Service
+import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.SystemClock
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.transition.Slide
-import android.transition.TransitionManager
-import android.view.*
-import android.widget.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.widget.EditText
+import android.widget.LinearLayout
 import com.example.heran.findacat.Adapter.CatItemClickListener
 import com.example.heran.findacat.Adapter.CatsAdapter
 import com.example.heran.findacat.Adapter.ILoadMore
 import com.example.heran.findacat.Manager.CatInfoManager
+import com.example.heran.findacat.Manager.LocationDetector
 import com.example.heran.findacat.Manager.PresistenceManager
 import com.example.heran.findacat.Model.generated.Pet
 import com.example.heran.findacat.R
 import kotlinx.android.synthetic.main.activity_list.*
-import android.content.Context.INPUT_METHOD_SERVICE
-import android.support.v4.content.ContextCompat.getSystemService
-import android.view.inputmethod.InputMethodManager
+import org.jetbrains.anko.alert
+import org.jetbrains.anko.toast
+import org.jetbrains.anko.yesButton
 
 
-class ListActivity : AppCompatActivity(), ILoadMore, CatInfoManager.CatInfoFinishedListener, CatItemClickListener {
+class ListActivity : AppCompatActivity(), ILoadMore, CatInfoManager.CatInfoFinishedListener, CatItemClickListener, LocationDetector.LocationListener {
 
-    private val KEY_PETIDX = "pet_idx"
+
+    companion object {
+        val KEY_PETIDX = "PetIdx"
+        val KEY_REQUESTTYPE = "RequestType"
+    }
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter : CatsAdapter
     private lateinit var progressBarLayout : LinearLayout
     private lateinit var popwindowLayout : LinearLayout
-
+    private lateinit var locationDetector: LocationDetector
+    private var actionbar : android.support.v7.app.ActionBar? = null
     private var offset = 0
     private val returnSize = 20
-    private var zipCode : String = "22202"
+    private var zipCode : String = ""
     private var requestType : Int = 0
+    private var lastClickPetIdx : Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list)
 
         setSupportActionBar(catlistToolbar)
-        val actionbar = supportActionBar
-
+        actionbar = supportActionBar
         actionbar?.setDisplayHomeAsUpEnabled(true)
+        actionbar?.title = ""
 
         PresistenceManager.setContext(this)
 
@@ -65,19 +73,20 @@ class ListActivity : AppCompatActivity(), ILoadMore, CatInfoManager.CatInfoFinis
         progressBarLayout.visibility = View.GONE
         CatInfoManager.catinfoListener = this
 
+        locationDetector = LocationDetector(this)
+        locationDetector.locationListener = this
 
         val bundle = intent.extras
         if(bundle!=null) {
-            requestType = bundle.getInt("RequestType", 0)
-            if(requestType == 0)
-            {
-                actionbar?.title = "Cat Near $zipCode"
+            requestType = bundle.getInt(KEY_REQUESTTYPE, 0)
+            if(requestType == 0) {
                 progressBarLayout.visibility = View.VISIBLE
-                getPetList()
+                locationDetector.detectLocation()
             }
             else
             {
-                actionbar?.title = "Favorite List"
+                val title = resources.getString(R.string.text_listactivity_title2)
+                actionbar?.title = title
                 val list = PresistenceManager.getList()
                 for(pet : Pet? in list)
                 {
@@ -89,12 +98,117 @@ class ListActivity : AppCompatActivity(), ILoadMore, CatInfoManager.CatInfoFinis
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (requestType == 1 && lastClickPetIdx != -1) {
+            val size = PresistenceManager.getList().size
+            val size2 = CatInfoManager.petlist.size
+            if (size < size2) {
+                CatInfoManager.petlist.removeAt(lastClickPetIdx)
+                adapter.notifyItemRemoved(lastClickPetIdx)
+            }
+            lastClickPetIdx = -1
+        }
+    }
+
+    private  fun initloadList()
+    {
+        val title = resources.getString(R.string.text_listactivity_title1,zipCode)
+        actionbar?.title = title
+        getPetList()
+    }
 
     private fun getPetList()
     {
-        CatInfoManager.getPetList(zipCode, "${offset}", "$returnSize")
+        CatInfoManager.getPetList(zipCode, "$offset", "$returnSize")
     }
 
+    private fun popLocationPermissionWindow()
+    {
+        val msg = resources.getString(R.string.locationErrPermission)
+        val btnY = resources.getString(R.string.btn_yes)
+        val btnI = resources.getString(R.string.btn_input)
+        val hint = resources.getString(R.string.locationInput)
+        alert(msg) {
+            positiveButton(btnY) { locationDetector.requestPermission(this@ListActivity) }
+            negativeButton(btnI) { popInputWindow(hint)}
+        }.show()
+    }
+
+    @SuppressLint("InflateParams")
+    private fun popInputWindow(hintText: String)
+    {
+        val inflater: LayoutInflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val promptsView = inflater.inflate(R.layout.pop_location_setting,null)
+
+        val alertDialogBuilder = AlertDialog.Builder(this)
+
+        alertDialogBuilder.setView(promptsView)
+
+        val editTextPopup = promptsView.findViewById<EditText>(R.id.et_locatio_pop)
+        editTextPopup.hint = hintText
+
+        alertDialogBuilder
+                .setCancelable(false)
+                .setPositiveButton("OK"
+                ) { _, _ ->
+                    val newzip = editTextPopup.text.toString()
+                    if(newzip != zipCode && newzip != "") {
+                        zipCode = newzip
+                        offset = 0
+                        val size = CatInfoManager.petlist.size
+                        CatInfoManager.petlist.clear()
+                        adapter.notifyItemRangeRemoved(0,size)
+                        progressBarLayout.visibility = View.VISIBLE
+                        CatInfoManager.getPetList(zipCode, "$offset", "$returnSize")
+
+                        val actionbar = supportActionBar
+                        val title = resources.getString(R.string.text_listactivity_title1,zipCode)
+                        actionbar?.title = title
+                    }
+                    else if(newzip == "")
+                    {
+                        val msg = resources.getString(R.string.locationInput)
+                        toast(msg)
+                    }
+                }
+                .setNegativeButton("Cancel"
+                ) { dialog, _ -> dialog.cancel() }
+
+        val alertDialog = alertDialogBuilder.create()
+        alertDialog.show()
+    }
+
+
+    override fun locationFound(location: String?) {
+        progressBarLayout.visibility = View.GONE
+        if( location != null)
+        {
+            zipCode = location
+            initloadList()
+        }
+        else
+        {
+            val msg = resources.getString(R.string.locationNotFound)
+            val btnY = resources.getString(R.string.btn_yes)
+            alert(msg) {
+                positiveButton(btnY) { }
+            }.show()
+        }
+    }
+
+    override fun locationNotFound(reason: LocationDetector.FailureReason) {
+        progressBarLayout.visibility = View.GONE
+        if(reason == LocationDetector.FailureReason.TIMEOUT)
+        {
+            val msg = resources.getString(R.string.locationErrTimeout)
+            toast(msg)
+        }
+        else if(reason == LocationDetector.FailureReason.NO_PERMISSION)
+        {
+            popLocationPermissionWindow()
+        }
+    }
 
     override fun onLoadMore() {
 
@@ -113,99 +227,47 @@ class ListActivity : AppCompatActivity(), ILoadMore, CatInfoManager.CatInfoFinis
 
     }
 
-    override fun loadListFailure() {
-    }
-
-    override fun loadSingleSuccess() {
-        adapter.notifyItemInserted(CatInfoManager.petlist.size-1)
-    }
-
-    override fun loadSingleFailure() {
+    override fun loadListFailure(msg : String) {
+        if(msg == "")
+        {
+            val msg2 = resources.getString(R.string.Err_Network)
+            msg.plus(msg2)
+        }
+        toast(msg)
+        progressBarLayout.visibility = View.GONE
     }
 
 
     override fun catClick(view : View, idx : Int)
     {
+        lastClickPetIdx = idx
         val intent = Intent(this@ListActivity, CatDetailActivity::class.java)
-        intent.putExtra("PetIdx", idx)
+        intent.putExtra(KEY_PETIDX, idx)
         startActivity(intent)
     }
 
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_catlist, menu)
+        if(requestType == 0) {
+            menuInflater.inflate(R.menu.menu_catlist, menu)
+        }
         return true
     }
 
+    @SuppressLint("InflateParams")
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
         R.id.btn_zip -> {
-
-            val inflater: LayoutInflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-
-            // Inflate a custom view using layout inflater
-            val view = inflater.inflate(R.layout.pop_location_setting,null)
-
-            // Initialize a new instance of popup window
-            val popupWindow = PopupWindow(
-                    view, // Custom view to show in popup window
-                    LinearLayout.LayoutParams.WRAP_CONTENT, // Width of popup window
-                    LinearLayout.LayoutParams.WRAP_CONTENT // Window height
-            )
-            popupWindow.elevation = 10.0F
-
-            val slideIn = Slide()
-            slideIn.slideEdge = Gravity.TOP
-            popupWindow.enterTransition = slideIn
-
-            // Slide animation for popup window exit transition
-            val slideOut = Slide()
-            slideOut.slideEdge = Gravity.BOTTOM
-            popupWindow.exitTransition = slideOut
-
-            val editTextPopup = view.findViewById<EditText>(R.id.et_locatio_pop)
-            val buttonPopup = view.findViewById<Button>(R.id.btn_location_ok)
-
-
-            editTextPopup.hint = "Your current location is $zipCode"
-
-            editTextPopup.requestFocus();
-
-            val imm = this.getSystemService(Service.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.showSoftInput(editTextPopup, 0);
-
-            popwindowLayout.isClickable = true
-            popwindowLayout.isFocusable = true
-
-            buttonPopup.setOnClickListener{
-                // Dismiss the popup window
-                popupWindow.dismiss()
-                popwindowLayout.isClickable = false
-                popwindowLayout.isFocusable = false
+            var t : String = ""
+            if(zipCode == "")
+            {
+                t = resources.getString(R.string.locationInput)
             }
+            else
+            {
+                t = resources.getString(R.string.text_listactivity_popwindow_hint, zipCode)
 
-            // Set a dismiss listener for popup window
-            popupWindow.setOnDismissListener {
-                //Toast.makeText(applicationContext,"Popup closed",Toast.LENGTH_SHORT).show()
-                var newzip = editTextPopup.text.toString();
-                newzip = "98101"
-                if(newzip != zipCode)
-                {
-                    zipCode = newzip
-                    offset = 0
-                    val size = CatInfoManager.petlist.size
-                    CatInfoManager.petlist.clear()
-                    adapter.notifyItemRangeRemoved(0,size)
-                    progressBarLayout.visibility = View.VISIBLE
-                    CatInfoManager.getPetList(zipCode, "${offset}", "$returnSize")
-                }
             }
-            TransitionManager.beginDelayedTransition(popwindowLayout)
-            popupWindow.showAtLocation(
-                    popwindowLayout, // Location to display popup window
-                    Gravity.CENTER, // Exact position of layout to display popup
-                    0, // X offset
-                    0 // Y offset
-            )
+            popInputWindow(t)
             true
         }
 
@@ -213,7 +275,6 @@ class ListActivity : AppCompatActivity(), ILoadMore, CatInfoManager.CatInfoFinis
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        //onBackPressed()
         CatInfoManager.petlist.clear()
         val intent = Intent(this@ListActivity, MenuActivity::class.java)
         startActivity(intent)

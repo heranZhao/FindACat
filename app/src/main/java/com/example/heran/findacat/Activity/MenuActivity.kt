@@ -6,6 +6,7 @@ import android.os.Handler
 import android.support.v7.app.AppCompatActivity
 import android.widget.Button
 import android.widget.TextView
+import com.example.heran.findacat.Manager.NetworkManager
 import com.example.heran.findacat.Model.generated.CatFact.CatFactResponse
 import com.example.heran.findacat.R
 import com.squareup.moshi.Moshi
@@ -21,12 +22,9 @@ import retrofit2.http.GET
 
 class MenuActivity : AppCompatActivity() {
 
-    //private var mFusedLocationClient: FusedLocationProviderClient? = null
-
     private lateinit var findBtn : Button
     private lateinit var favoriteBtn : Button
     private lateinit var tvcatFact : TextView
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,18 +32,31 @@ class MenuActivity : AppCompatActivity() {
 
         findBtn = findViewById(R.id.menu_find_btn)
         favoriteBtn = findViewById(R.id.menu_favorite_btn)
-        tvcatFact = findViewById<TextView>(R.id.tv_cat_fact)
+        tvcatFact = findViewById(R.id.tv_cat_fact)
 
 
         findBtn.setOnClickListener {
-            val intent = Intent( this, ListActivity::class.java)
-            intent.putExtra("RequestType", 0)
-            startActivity(intent)
+
+            if(NetworkManager.isNetworkAvailable(this))
+            {
+                val intent = Intent( this, ListActivity::class.java)
+                intent.putExtra(ListActivity.KEY_REQUESTTYPE, 0)
+                startActivity(intent)
+            }
+            else
+                NetworkManager.requestPermission(this)
+
         }
         favoriteBtn.setOnClickListener {
-            val intent = Intent( this, ListActivity::class.java)
-            intent.putExtra("RequestType", 1)
-            startActivity(intent)
+
+            if(NetworkManager.isNetworkAvailable(this))
+            {
+                val intent = Intent(this, ListActivity::class.java)
+                intent.putExtra(ListActivity.KEY_REQUESTTYPE, 1)
+                startActivity(intent)
+            }
+            else
+                NetworkManager.requestPermission(this)
         }
 
     }
@@ -57,7 +68,6 @@ class MenuActivity : AppCompatActivity() {
         showCatFact()
 
     }
-
 
     private fun showCatFact()
     {
@@ -87,8 +97,6 @@ class MenuActivity : AppCompatActivity() {
                                 val bingResponseBody = response.body()
 
                                 if(bingResponseBody != null) {
-
-                                    val fact: String = getString(R.string.cat_fact)
 
                                     tvcatFact.text = bingResponseBody.fact
                                     Handler().postDelayed({

@@ -21,9 +21,7 @@ object CatInfoManager
 
     interface CatInfoFinishedListener{
         fun loadListSuccess()
-        fun loadListFailure()
-        fun loadSingleSuccess()
-        fun loadSingleFailure()
+        fun loadListFailure(msg : String)
     }
 
 
@@ -41,26 +39,37 @@ object CatInfoManager
                 .enqueue(object: Callback<PetfinderPetRecord> {
 
                     override fun onFailure(call: Call<PetfinderPetRecord>, t: Throwable) {
-                        var a = 0
+                        catinfoListener?.loadListFailure("")
                     }
 
                     override fun onResponse(call: Call<PetfinderPetRecord>, response: Response<PetfinderPetRecord>) {
                         val bingResponseBody = response.body()
 
                         if(bingResponseBody != null) {
-                            val temp = bingResponseBody.petfinder?.pets?.pet
-                            if(temp != null)
+
+                            val code = bingResponseBody.petfinder?.header?.status?.code
+                            if(code?.T == "100")
                             {
-                                for(pet : Pet? in temp)
+                                val temp = bingResponseBody.petfinder?.pets?.pet
+                                if(temp != null)
                                 {
-                                    petlist.add(pet)
+                                    for(pet : Pet? in temp)
+                                    {
+                                        petlist.add(pet)
+                                    }
+
+                                    catinfoListener?.loadListSuccess()
                                 }
-
-                                catinfoListener?.loadListSuccess()
                             }
-
+                            else
+                            {
+                                val msg = bingResponseBody.petfinder?.header?.status?.message?.T
+                                if(msg != null) {
+                                    catinfoListener?.loadListFailure(msg)
+                                }
+                            }
                         }else{
-                            catinfoListener?.loadListFailure()
+                            catinfoListener?.loadListFailure("")
                         }
 
                     }

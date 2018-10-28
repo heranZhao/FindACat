@@ -24,16 +24,8 @@
                     android:id="@+id/et_locatio_pop"
                     android:layout_width="300dp"
                     android:layout_height="50dp"
-                    android:editable="true"
-                    android:enabled="true"
                     android:inputType="number" />
 
-                <Button
-                    android:id="@+id/btn_location_ok"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="50dp"
-                    android:text="@string/btn_locationok" />
 
             </LinearLayout>
 

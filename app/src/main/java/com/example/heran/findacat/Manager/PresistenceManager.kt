@@ -8,7 +8,6 @@ import android.util.Log
 import com.example.heran.findacat.Model.generated.Pet
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
-import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import java.io.IOException
 import java.util.*
 import kotlin.collections.ArrayList
@@ -17,8 +16,9 @@ object PresistenceManager
 {
 
     private var sharePreferences: SharedPreferences? = null
+
     private val KEY_FAVORITELIST = "key_favoritelist"
-    private var editor : SharedPreferences.Editor? = null
+
     private var idlist : MutableList<Pet?> = ArrayList()
     private val listType  = Types.newParameterizedType(List::class.java, Pet::class.java)
     private val moshi = Moshi.Builder()
@@ -31,7 +31,6 @@ object PresistenceManager
         {
             sharePreferences = PreferenceManager.getDefaultSharedPreferences(context)
             idlist = getFavoriteList()
-            editor = sharePreferences?.edit()
         }
     }
 
@@ -42,10 +41,12 @@ object PresistenceManager
 
     fun addFavorite(pet :Pet)
     {
-        if(!idlist?.contains(pet)!!)
+        if(!idlist.contains(pet))
         {
-            idlist?.add(pet)
-            val jsonString = jsonAdapter.toJson(idlist);
+            idlist.add(pet)
+            val jsonString = jsonAdapter.toJson(idlist)
+            val editor = sharePreferences?.edit()
+
             editor?.putString(KEY_FAVORITELIST, jsonString)
 
             editor?.apply()
@@ -55,31 +56,22 @@ object PresistenceManager
 
     fun rmvFavorite(pet : Pet) : Boolean
     {
-        if(idlist?.contains(pet)!!)
+        if(idlist.contains(pet))
         {
-            idlist?.remove(pet)
-            val jsonString = jsonAdapter.toJson(idlist);
+            idlist.remove(pet)
+            val jsonString = jsonAdapter.toJson(idlist)
+            val editor = sharePreferences?.edit()
             editor?.putString(KEY_FAVORITELIST, jsonString)
             editor?.apply()
         }
         return false
     }
 
-
-
-
-    fun clearFavoriteList()
-    {
-        idlist = ArrayList()
-        editor?.putStringSet(KEY_FAVORITELIST, null)
-        editor?.apply()
-    }
-
     private fun getFavoriteList() : MutableList<Pet?>
     {
         val jsonString = sharePreferences?.getString(KEY_FAVORITELIST, null)
-        if(jsonString == null) {
-            return ArrayList()
+        return if(jsonString == null) {
+            ArrayList()
         }
         else {
             var pets:List<Pet?>? = ArrayList()
@@ -89,12 +81,7 @@ object PresistenceManager
                 Log.e(ContentValues.TAG, e.message)
             }
 
-            if(pets != null) {
-                return pets.toMutableList()
-            }
-            else {
-                return ArrayList()
-            }
+            pets?.toMutableList() ?: ArrayList()
         }
     }
 

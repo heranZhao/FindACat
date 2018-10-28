@@ -14,4 +14,25 @@
     <string name="cat_des">Description</string>
     <string name="btn_locationok">OK</string>
     <string name="btn_location_list">search</string>
+    <string name="btn_changelanguage">Language</string>
+    <string name="btn_yes">OK</string>
+    <string name="btn_input">Input</string>
+    <string name="btn_cancle">Cancle</string>
+
+    <string name="text_listactivity_title1">cat near %s</string>
+    <string name="text_listactivity_title2">Favorite List</string>
+    <string name="text_listactivity_popwindow_hint">Your current location is %s</string>
+    <string name="text_detailactivity_mail_title">Send Email using:</string>
+    <string name="text_default_location">Your default location is %s.</string>
+    <string name="Err_Network">Network Error</string>
+    <string name="btn_locationcancel">Cancel</string>
+    <string name="sharecontent">Check out this cat named %s! </string>
+    <string name="sharecontent2">Email %s for more info.</string>
+    <string name="emailcontent">I’m interested in your cat named %s</string>
+    <string name="askNetwork">This function need network to load, please open your network.</string>
+    <string name="locationErrTimeout">Time out to request your location, please check the network again.</string>
+    <string name="locationErrPermission">To find the cat near you, please open the location permission. Or you can input the location by yourself.</string>
+    <string name="locationNotFound">We could not find your location, please check your network.</string>
+    <string name="locationSetTitle">Set Location</string>
+    <string name="locationInput">Please enter the zipcode.</string>
 </resources>

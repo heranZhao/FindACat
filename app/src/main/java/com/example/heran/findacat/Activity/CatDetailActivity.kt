@@ -49,7 +49,7 @@ class CatDetailActivity: AppCompatActivity()
         val bundle = intent.extras
         if(bundle!=null)
         {
-            val idx = bundle.getInt("PetIdx")
+            val idx = bundle.getInt(ListActivity.KEY_PETIDX)
             pet = CatInfoManager.petlist[idx]
 
             tvCatName.text = pet?.name?.T
@@ -80,7 +80,7 @@ class CatDetailActivity: AppCompatActivity()
 
     }
 
-    fun setFavorite(fav : Boolean)
+    private fun setFavorite(fav : Boolean)
     {
         isFavorite = fav
         if(isFavorite)
@@ -129,25 +129,22 @@ class CatDetailActivity: AppCompatActivity()
             true
         }
         R.id.btn_mail -> {
-            val to = "person@gmail.com"
-            val subject = "Test"
-            val message = "Test22222"
-
+            val content = resources.getString(R.string.emailcontent, pet?.name?.T)
             val intent = Intent(Intent.ACTION_SEND)
-            val addressees = arrayOf(to)
-            intent.putExtra(Intent.EXTRA_EMAIL, addressees)
-            intent.putExtra(Intent.EXTRA_SUBJECT, subject)
-            intent.putExtra(Intent.EXTRA_TEXT, message)
+            intent.putExtra(Intent.EXTRA_EMAIL, pet?.contact?.email?.T)
+            intent.putExtra(Intent.EXTRA_SUBJECT, content)
             intent.setType("message/rfc822")
-            startActivity(Intent.createChooser(intent, "Send Email using:"));
+            startActivity(Intent.createChooser(intent, resources.getString(R.string.text_detailactivity_mail_title)))
             true
         }
         R.id.btn_share -> {
 
+            val content = resources.getString(R.string.sharecontent, pet?.name?.T) +
+                    resources.getString(R.string.sharecontent2, pet?.contact?.email?.T)
             val shareIntent = Intent()
             shareIntent.action = Intent.ACTION_SEND
             shareIntent.type="text/plain"
-            shareIntent.putExtra(Intent.EXTRA_TEXT, "This is my text to send.");
+            shareIntent.putExtra(Intent.EXTRA_TEXT, content);
             startActivity(Intent.createChooser(shareIntent,getString(R.string.abc_action_bar_home_description)))
 
             true
