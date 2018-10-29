@@ -247,12 +247,8 @@ class ListActivity : AppCompatActivity(), ILoadMore, CatInfoManager.CatInfoFinis
     }
 
     override fun loadListFailure(msg : String) {
-        if(msg == "")
-        {
-            val msg2 = resources.getString(R.string.Err_Network)
-            msg.plus(msg2)
-        }
-        toast(msg)
+        val msg2 = resources.getString(R.string.Err_Network)
+        toast(msg2)
         progressBarLayout.visibility = View.GONE
     }
 
