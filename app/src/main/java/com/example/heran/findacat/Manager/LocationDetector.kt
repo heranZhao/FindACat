@@ -39,6 +39,18 @@ class LocationDetector(private val context: Context) {
         fun locationNotFound(reason: FailureReason)
     }
 
+    fun checkPermission() : Boolean
+    {
+        val permissionResult = ContextCompat.checkSelfPermission(context,
+                android.Manifest.permission.ACCESS_FINE_LOCATION);
+
+        //if location permission granted, proceed with location detection
+        if(permissionResult == PackageManager.PERMISSION_GRANTED) {
+            return true
+        }
+        return false
+    }
+
     fun requestPermission(act: Activity)
     {
         act.requestPermissions(permission, REQUEST_TYPE)

@@ -30,6 +30,8 @@
     <string name="sharecontent2">Email %s for more info.</string>
     <string name="emailcontent">I’m interested in your cat named %s</string>
     <string name="askNetwork">This function need network to load, please open your network.</string>
+    <string name="noNetwork">Network is unavailable, please check your network.</string>
+
     <string name="locationErrTimeout">Time out to request your location, please check the network again.</string>
     <string name="locationErrPermission">To find the cat near you, please open the location permission. Or you can input the location by yourself.</string>
     <string name="locationNotFound">We could not find your location, please check your network.</string>

@@ -47,6 +47,7 @@ class ListActivity : AppCompatActivity(), ILoadMore, CatInfoManager.CatInfoFinis
     private var zipCode : String = ""
     private var requestType : Int = 0
     private var lastClickPetIdx : Int = -1
+    private var waitforPermission = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -109,6 +110,22 @@ class ListActivity : AppCompatActivity(), ILoadMore, CatInfoManager.CatInfoFinis
             }
             lastClickPetIdx = -1
         }
+        if( requestType == 0 && waitforPermission)
+        {
+            val flag = locationDetector.checkPermission()
+            if(flag)
+            {
+                progressBarLayout.visibility = View.VISIBLE
+                locationDetector.detectLocation()
+                waitforPermission = false
+            }
+            else
+            {
+                val msg = resources.getString(R.string.locationErrPermission)
+                toast(msg)
+                waitforPermission = false
+            }
+        }
     }
 
     private  fun initloadList()
@@ -129,8 +146,10 @@ class ListActivity : AppCompatActivity(), ILoadMore, CatInfoManager.CatInfoFinis
         val btnY = resources.getString(R.string.btn_yes)
         val btnI = resources.getString(R.string.btn_input)
         val hint = resources.getString(R.string.locationInput)
+
         alert(msg) {
-            positiveButton(btnY) { locationDetector.requestPermission(this@ListActivity) }
+            positiveButton(btnY) { waitforPermission = true
+                locationDetector.requestPermission(this@ListActivity) }
             negativeButton(btnI) { popInputWindow(hint)}
         }.show()
     }
@@ -147,11 +166,10 @@ class ListActivity : AppCompatActivity(), ILoadMore, CatInfoManager.CatInfoFinis
 
         val editTextPopup = promptsView.findViewById<EditText>(R.id.et_locatio_pop)
         editTextPopup.hint = hintText
-
-        alertDialogBuilder
-                .setCancelable(false)
-                .setPositiveButton("OK"
-                ) { _, _ ->
+        val btnY = resources.getString(R.string.btn_yes)
+        val btnC = resources.getString(R.string.btn_cancle)
+        alertDialogBuilder.setNegativeButton(btnC) { dialog, _ -> dialog.cancel() }
+        alertDialogBuilder.setPositiveButton(btnY) { _, _ ->
                     val newzip = editTextPopup.text.toString()
                     if(newzip != zipCode && newzip != "") {
                         zipCode = newzip
@@ -172,8 +190,7 @@ class ListActivity : AppCompatActivity(), ILoadMore, CatInfoManager.CatInfoFinis
                         toast(msg)
                     }
                 }
-                .setNegativeButton("Cancel"
-                ) { dialog, _ -> dialog.cancel() }
+
 
         val alertDialog = alertDialogBuilder.create()
         alertDialog.show()
@@ -182,6 +199,7 @@ class ListActivity : AppCompatActivity(), ILoadMore, CatInfoManager.CatInfoFinis
 
     override fun locationFound(location: String?) {
         progressBarLayout.visibility = View.GONE
+        waitforPermission = false
         if( location != null)
         {
             zipCode = location
@@ -201,6 +219,7 @@ class ListActivity : AppCompatActivity(), ILoadMore, CatInfoManager.CatInfoFinis
         progressBarLayout.visibility = View.GONE
         if(reason == LocationDetector.FailureReason.TIMEOUT)
         {
+            waitforPermission = false
             val msg = resources.getString(R.string.locationErrTimeout)
             toast(msg)
         }

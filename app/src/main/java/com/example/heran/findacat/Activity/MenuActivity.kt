@@ -12,6 +12,7 @@ import com.example.heran.findacat.R
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.toast
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -34,6 +35,7 @@ class MenuActivity : AppCompatActivity() {
         favoriteBtn = findViewById(R.id.menu_favorite_btn)
         tvcatFact = findViewById(R.id.tv_cat_fact)
 
+        val noNetworkMsg = resources.getString(R.string.noNetwork)
 
         findBtn.setOnClickListener {
 
@@ -44,7 +46,7 @@ class MenuActivity : AppCompatActivity() {
                 startActivity(intent)
             }
             else
-                NetworkManager.requestPermission(this)
+                toast(noNetworkMsg)
 
         }
         favoriteBtn.setOnClickListener {
@@ -56,7 +58,7 @@ class MenuActivity : AppCompatActivity() {
                 startActivity(intent)
             }
             else
-                NetworkManager.requestPermission(this)
+                toast(noNetworkMsg)
         }
 
     }

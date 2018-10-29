@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Find A Cat</string>
+    <string name="cat_name">名字: </string>
+    <string name="cat_sex">性别:</string>
+    <string name="cat_age">年龄:</string>
+    <string name="btn_find">查找</string>
+    <string name="btn_like">喜欢</string>
+    <string name="cat_fact">关于猫的两三事:</string>
+    <string name="cat_zip">邮编:</string>
+    <string name="cat_breed">血统:</string>
+    <string name="btn_menu_favorite">喜爱</string>
+    <string name="btn_menu_email">邮箱</string>
+    <string name="btn_menu_share">分享</string>
+    <string name="cat_des">详细描述</string>
+    <string name="btn_locationok">确认</string>
+    <string name="btn_location_list">查询</string>
+    <string name="btn_changelanguage">语言</string>
+    <string name="btn_yes">确认</string>
+    <string name="btn_input">输入</string>
+    <string name="btn_cancle">取消</string>
+
+    <string name="text_listactivity_title1">在%s附近的猫</string>
+    <string name="text_listactivity_title2">已收藏列表</string>
+    <string name="text_listactivity_popwindow_hint">您的当前位置是%s</string>
+    <string name="text_detailactivity_mail_title">请选择发送方式:</string>
+    <string name="text_default_location">您的默认位置是%s。</string>
+    <string name="Err_Network">网络错误</string>
+    <string name="btn_locationcancel">取消</string>
+    <string name="sharecontent">来看看这只猫，他叫%s! </string>
+    <string name="sharecontent2">发送邮件至%s来获取更多的资料。</string>
+    <string name="emailcontent">我对%s很感兴趣。</string>
+    <string name="askNetwork">这些功能需要连接网络，请打开网络获取更多信息。</string>
+    <string name="noNetwork">网络目前不可用，请检查您的网络。</string>
+
+    <string name="locationErrTimeout">获取位置超时，请检查您的网络。</string>
+    <string name="locationErrPermission">为了获取您周边的猫咪资料，请允许我们获取您的位置。或者，您也可以自行输入位置。</string>
+    <string name="locationNotFound">我们无法找到您现在的位置，请检查网络。</string>
+    <string name="locationSetTitle">设置位置</string>
+    <string name="locationInput">请输入邮编。</string>
+</resources>
